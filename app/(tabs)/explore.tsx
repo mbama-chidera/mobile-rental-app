@@ -1,112 +1,322 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+// app/(tabs)/explore.tsx
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
+import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import StatusBar from '../../components/common/StatusBar';
+import PropertyCard from '../../components/property/PropertyCard';
+import { Colors } from '../../constants/Colors';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+const { width } = Dimensions.get('window');
 
-export default function TabTwoScreen() {
+interface ExploreProperty {
+  id: string;
+  name: string;
+  location: string;
+  address?: string;
+  price: number;
+  rating: number;
+  type: string;
+  discount?: number;
+}
+
+export default function ExploreScreen() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  const filters = [
+    { id: 'all', label: 'All' },
+    { id: 'house', label: 'House' },
+    { id: 'apartment', label: 'Apartment' },
+    { id: 'villa', label: 'Villa' },
+    { id: 'cabin', label: 'Cabin' },
+  ];
+
+  const properties: ExploreProperty[] = [
+    { id: '1', name: 'Modern Apartment', location: 'Downtown, Calgary', address: '123 Main St, Calgary', price: 120, rating: 4.8, type: 'apartment' },
+    { id: '2', name: 'Luxury Villa', location: 'Banff, AB', address: '456 Mountain Rd, Banff', price: 450, rating: 4.9, type: 'villa' },
+    { id: '3', name: 'Cozy Cabin', location: 'Kananaskis, AB', address: '789 Forest Ln, Kananaskis', price: 200, discount: 15, rating: 4.7, type: 'cabin' },
+    { id: '4', name: 'Family House', location: 'NW Calgary', address: '321 Suburb St, Calgary', price: 300, rating: 4.6, type: 'house' },
+    { id: '5', name: 'Studio Loft', location: 'Beltline, Calgary', address: '654 Urban Ave, Calgary', price: 180, rating: 4.5, type: 'apartment' },
+    { id: '6', name: 'Mountain Retreat', location: 'Canmore, AB', address: '987 Alpine Way, Canmore', price: 350, discount: 10, rating: 4.9, type: 'villa' },
+  ];
+
+  const filteredProperties = activeFilter === 'all'
+    ? properties
+    : properties.filter(p => p.type === activeFilter);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <StatusBar />
+      
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Explore</Text>
+          <Text style={styles.subtitle}>Find your perfect stay</Text>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color={Colors.textSecondary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search locations, properties..."
+            placeholderTextColor={Colors.placeholder}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+
+        {/* Filters */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll}>
+          <View style={styles.filtersContainer}>
+            {filters.map((filter) => (
+              <TouchableOpacity
+                key={filter.id}
+                style={[
+                  styles.filterButton,
+                  activeFilter === filter.id && styles.filterButtonActive,
+                ]}
+                onPress={() => setActiveFilter(filter.id)}
+              >
+                <Text style={[
+                  styles.filterText,
+                  activeFilter === filter.id && styles.filterTextActive,
+                ]}>
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Map View */}
+        <TouchableOpacity style={styles.mapPreview}>
+          <View style={styles.mapPlaceholder} />
+          <View style={styles.mapOverlay}>
+            <Text style={styles.mapText}>View on Map</Text>
+            <Ionicons name="map" size={20} color={Colors.white} />
+          </View>
+        </TouchableOpacity>
+
+        {/* Properties Grid */}
+        <View style={styles.propertiesContainer}>
+          <Text style={styles.sectionTitle}>Available Properties</Text>
+          
+          <FlatList
+            data={filteredProperties}
+            renderItem={({ item }) => (
+              <Link href={`/property/${item.id}`} asChild>
+                <TouchableOpacity style={styles.propertyItem}>
+                  <View style={styles.propertyImage} />
+                  <View style={styles.propertyInfo}>
+                    <View style={styles.propertyHeader}>
+                      <Text style={styles.propertyName}>{item.name}</Text>
+                      <View style={styles.ratingContainer}>
+                        <Ionicons name="star" size={14} color={Colors.rating} />
+                        <Text style={styles.ratingText}>{item.rating}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.propertyLocation}>{item.location}</Text>
+                    <View style={styles.propertyFooter}>
+                      <Text style={styles.propertyPrice}>${item.price} /night</Text>
+                      {item.discount && (
+                        <View style={styles.discountBadge}>
+                          <Text style={styles.discountText}>{item.discount}% Off</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </Link>
+            )}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            numColumns={2}
+            columnWrapperStyle={styles.propertyRow}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  titleContainer: {
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.text,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.card,
+    marginHorizontal: 20,
+    marginVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 12,
+    fontSize: 16,
+    color: Colors.text,
+  },
+  filtersScroll: {
+    marginHorizontal: 20,
+  },
+  filtersContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  filterButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: Colors.card,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  filterButtonActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  filterText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  filterTextActive: {
+    color: Colors.white,
+    fontWeight: '600',
+  },
+  mapPreview: {
+    margin: 20,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  mapPlaceholder: {
+    height: 150,
+    backgroundColor: Colors.gray4,
+  },
+  mapOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  mapText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  propertiesContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 16,
+  },
+  propertyRow: {
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  propertyItem: {
+    width: (width - 48) / 2,
+    backgroundColor: Colors.card,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  propertyImage: {
+    width: '100%',
+    height: 120,
+    backgroundColor: Colors.gray4,
+  },
+  propertyInfo: {
+    padding: 12,
+  },
+  propertyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  propertyName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    flex: 1,
+    marginRight: 8,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  ratingText: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 2,
+  },
+  propertyLocation: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  propertyFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  propertyPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: Colors.primary,
+  },
+  discountBadge: {
+    backgroundColor: Colors.danger,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  discountText: {
+    color: Colors.white,
+    fontSize: 10,
+    fontWeight: '600',
   },
 });
