@@ -1,22 +1,26 @@
 // app/(auth)/sign-in.tsx
+import { Ionicons } from '@expo/vector-icons';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
-  Text,
+  Alert,
   ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  StyleSheet,
+  View,
 } from 'react-native';
-import { Link, router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../store/slices/authSlice';
 import StatusBar from '../../components/common/StatusBar';
 import { Colors } from '../../constants/Colors';
+import { loginSuccess } from '../../store/slices/authSlice';
+
+import { getAuth, signInWithEmailAndPassword } from '@react-native-firebase/auth';
+import { getFirestore } from '@react-native-firebase/firestore';
 
 export default function SignInScreen() {
+  const auth = getAuth();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: '',
@@ -38,9 +42,12 @@ export default function SignInScreen() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const userData = await getFirestore().collection('guests').doc(userCredential.user.uid).get();
+
       const mockUser = {
-        id: 'user_123',
-        name: 'John Doe',
+        id: userCredential.user.uid,
+        name: userData.data()?.firstName + ' ' + userData.data()?.lastName || 'John Doe',
         email: formData.email,
         phoneNumber: '+1 (123) 456-7890',
         country: 'Canada',
@@ -52,7 +59,7 @@ export default function SignInScreen() {
       };
 
       dispatch(loginSuccess({ user: mockUser, token: 'mock_jwt_token' }));
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/home');
     } catch (error) {
       Alert.alert('Sign In Failed', 'Please check your credentials');
     } finally {

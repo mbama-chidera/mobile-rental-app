@@ -1,22 +1,24 @@
 // app/(tabs)/profile.tsx
+import { Ionicons } from '@expo/vector-icons';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
-  Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Link, router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import StatusBar from '../../components/common/StatusBar';
-import Button from '../../components/common/Button';
 import { Colors } from '../../constants/Colors';
-import { logout } from '../../store/slices/authSlice';
 import { RootState } from '../../store';
+import { logout } from '../../store/slices/authSlice';
+
+import { getAuth } from '@react-native-firebase/auth';
 
 export default function ProfileScreen() {
+  const auth = getAuth();
   const dispatch = useDispatch();
   const { user, isHost } = useSelector((state: RootState) => state.auth);
   
@@ -39,8 +41,11 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
-    dispatch(logout());
-    router.replace('/');
+    if(auth.currentUser) {
+      auth.signOut();
+      dispatch(logout());
+      router.replace('/');
+    }
   };
 
   return (
