@@ -1,7 +1,7 @@
 // app/booking/index.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -17,6 +17,8 @@ import StatusBar from '../../components/common/StatusBar';
 import { Colors } from '../../constants/Colors';
 
 import { getAuth } from '@react-native-firebase/auth';
+import { getFirestore } from '@react-native-firebase/firestore';
+
 import { Alert } from 'react-native';
 
 export default function BookingScreen() {
@@ -86,6 +88,28 @@ export default function BookingScreen() {
       Alert.alert('Booking Failed', 'Unable to complete the booking. Please try again later.');
     }
   }
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        await getFirestore().doc(`guests/${user.uid}`).get().then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            setUserInfo({
+              name: data?.firstName + ' ' + data?.lastName || 'Tiring Tin Bui',
+              email: data?.email || 'example@gmail.com',
+              gender: data?.gender || 'Male',
+              phoneNumber: data?.phoneNumber || '+1 (123) 456-7890',
+              country: data?.country || 'Canada',
+            });
+          }
+        });
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const renderStep1 = () => (
     <>
