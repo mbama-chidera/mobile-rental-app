@@ -1,29 +1,29 @@
 // app/(tabs)/index.tsx
-import { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
-import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Link } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import Button from '../../components/common/Button';
 import StatusBar from '../../components/common/StatusBar';
 import PropertyCard from '../../components/property/PropertyCard';
-import Button from '../../components/common/Button';
 import { Colors } from '../../constants/Colors';
-import { fetchPropertiesStart, fetchPropertiesSuccess } from '../../store/slices/propertySlice';
 import { RootState } from '../../store';
+import { fetchPropertiesStart, fetchPropertiesSuccess } from '../../store/slices/propertySlice';
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
   const { propertyCards } = useSelector(
     (state: RootState) => state.properties
   );
-  
+
   const [location] = useState('Calgary, AB');
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function HomeScreen() {
 
   const loadProperties = async () => {
     dispatch(fetchPropertiesStart());
-    
+
     try {
       const mockProperties = [
         {
@@ -117,7 +117,7 @@ export default function HomeScreen() {
           isAvailable: true,
         },
       ];
-      
+
       dispatch(fetchPropertiesSuccess(mockProperties));
     } catch (error) {
       console.error('Failed to load properties:', error);
@@ -127,7 +127,7 @@ export default function HomeScreen() {
   const renderPropertyCard = ({ item }: { item: any }) => (
     <Link href={`/property/${item.id}`} asChild>
       <TouchableOpacity style={{ marginRight: 16 }}>
-        <PropertyCard 
+        <PropertyCard
           property={{
             id: item.id,
             name: item.name,
@@ -137,8 +137,8 @@ export default function HomeScreen() {
             discount: item.discount,
             rating: item.rating,
             reviewCount: item.reviewCount
-          }} 
-          onPress={() => {}} 
+          }}
+          onPress={() => { }}
         />
       </TouchableOpacity>
     </Link>
@@ -147,7 +147,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar />
-      
+
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -229,7 +229,7 @@ export default function HomeScreen() {
             <Link href="/host/become-host" asChild>
               <Button
                 title="Get Started"
-                onPress={() => {}}
+                onPress={() => { }}
                 variant="secondary"
                 style={styles.hostButton}
               />
