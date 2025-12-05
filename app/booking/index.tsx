@@ -1,22 +1,29 @@
 // app/booking/index.tsx
-import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
   ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import StatusBar from '../../components/common/StatusBar';
 import DateSelector from '../../components/booking/DateSelector';
 import GuestSelector from '../../components/booking/GuestSelector';
 import Button from '../../components/common/Button';
+import StatusBar from '../../components/common/StatusBar';
 import { Colors } from '../../constants/Colors';
 
+import { getAuth } from '@react-native-firebase/auth';
+import { getFirestore } from '@react-native-firebase/firestore';
+
+import { Alert } from 'react-native';
+
 export default function BookingScreen() {
+  const auth = getAuth();
+
   const [activeStep, setActiveStep] = useState(1);
   const [checkInDate, setCheckInDate] = useState('2025-10-04');
   const [checkOutDate, setCheckOutDate] = useState('2025-11-03');
@@ -55,6 +62,54 @@ export default function BookingScreen() {
     { day: 'Tue', date: '5 Nov', value: '2025-11-05' },
     { day: 'Wed', date: '6 Nov', value: '2025-11-06' },
   ];
+
+  const createBooking = async () => {
+    const guestId = auth.currentUser?.uid;
+
+    console.log('Confirming booking...');
+
+    const response = await fetch('http://10.0.0.204:5000/property/hd1Zha77cpIpf5sehM4V/book', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${await auth.currentUser?.getIdToken()}`,
+      },
+      body: JSON.stringify({
+        guestBookingId: guestId,
+        timeOfBookingStart: checkInDate,
+        timeOfBookingEnd: checkOutDate
+      })
+    })
+    
+    if (response.ok) {
+      router.push('/booking/success');
+    } else {
+      console.log(response);
+      Alert.alert('Booking Failed', 'Unable to complete the booking. Please try again later.');
+    }
+  }
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        await getFirestore().doc(`guests/${user.uid}`).get().then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            setUserInfo({
+              name: data?.firstName + ' ' + data?.lastName || 'Tiring Tin Bui',
+              email: data?.email || 'example@gmail.com',
+              gender: data?.gender || 'Male',
+              phoneNumber: data?.phoneNumber || '+1 (123) 456-7890',
+              country: data?.country || 'Canada',
+            });
+          }
+        });
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const renderStep1 = () => (
     <>
@@ -273,7 +328,7 @@ export default function BookingScreen() {
 
       <Button
         title="Confirm Payment"
-        onPress={() => router.push('/booking/success')}
+        onPress={() => createBooking()}
         style={styles.confirmButton}
       />
     </>

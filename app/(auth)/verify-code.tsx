@@ -1,14 +1,14 @@
 // app/(auth)/verify-code.tsx
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  StyleSheet,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
 import StatusBar from '../../components/common/StatusBar';
 import { Colors } from '../../constants/Colors';
 
@@ -26,7 +26,7 @@ export default function VerifyCodeScreen() {
     setLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/home');
     } catch (error) {
       Alert.alert('Verification Failed', 'Please try again');
     } finally {
