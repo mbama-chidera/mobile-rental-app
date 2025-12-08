@@ -1,16 +1,28 @@
 // app/index.tsx
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import StatusBar from '../components/common/StatusBar';
 import { Colors } from '../constants/Colors';
 
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+
+SplashScreen.preventAutoHideAsync();
+
 export default function Index() {
+  useEffect(() => {
+    console.log('Splash screen will hide after 5 seconds');
+    setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 5000);
+  }, [])
+
   return (
     <View style={styles.container}>
       <StatusBar />
       
       <View style={styles.content}>
-        <Text style={styles.title}>RentalApp</Text>
+        <Image source={require('../assets/images/landscape-logo-blue.png')} />
         <Text style={styles.subtitle}>
           Find your perfect stay anywhere in the world
         </Text>

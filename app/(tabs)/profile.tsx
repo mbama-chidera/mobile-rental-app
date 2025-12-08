@@ -15,7 +15,7 @@ import { Colors } from '../../constants/Colors';
 import { RootState } from '../../store';
 import { logout } from '../../store/slices/authSlice';
 
-import { getAuth } from '@react-native-firebase/auth';
+import { getAuth, signOut } from '@react-native-firebase/auth';
 
 export default function ProfileScreen() {
   const auth = getAuth();
@@ -42,7 +42,7 @@ export default function ProfileScreen() {
 
   const handleLogout = () => {
     if(auth.currentUser) {
-      auth.signOut();
+      signOut(auth);
       dispatch(logout());
       router.replace('/');
     }

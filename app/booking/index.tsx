@@ -21,6 +21,8 @@ import { getFirestore } from '@react-native-firebase/firestore';
 
 import { Alert } from 'react-native';
 
+import * as SplashScreen from 'expo-splash-screen';
+
 export default function BookingScreen() {
   const auth = getAuth();
 
@@ -68,7 +70,9 @@ export default function BookingScreen() {
 
     console.log('Confirming booking...');
 
-    const response = await fetch('http://10.0.0.204:5000/property/hd1Zha77cpIpf5sehM4V/book', {
+    SplashScreen.preventAutoHideAsync();
+
+    const response = await fetch('http://<BACKEND_URL_HERE>/property/hd1Zha77cpIpf5sehM4V/book', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,13 +84,22 @@ export default function BookingScreen() {
         timeOfBookingEnd: checkOutDate
       })
     })
-    
-    if (response.ok) {
-      router.push('/booking/success');
-    } else {
-      console.log(response);
-      Alert.alert('Booking Failed', 'Unable to complete the booking. Please try again later.');
-    }
+    .catch((error) => {
+      console.error('Error during booking:', error);
+      Alert.alert('Booking Failed', 'An error occurred while processing your booking. Please try again later.');
+    })
+    .finally(() => {
+      SplashScreen.hideAsync();
+    });
+
+    if(response)
+      if (response.ok) {
+        router.push('/booking/success');
+        SplashScreen.hideAsync();
+      } else {
+        console.log(response);
+        Alert.alert('Booking Failed', 'Unable to complete the booking. Please try again later.');
+      }
   }
 
   useEffect(() => {

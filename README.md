@@ -1,6 +1,6 @@
 # Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Important**: Replace all the fetch request URL part <BACKEND_URL_HERE> with the backend url express server. They are in the sign-up.tsx page and booking.tsx page
 
 ## Get started
 
