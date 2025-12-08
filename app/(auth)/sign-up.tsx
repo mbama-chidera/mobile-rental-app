@@ -1,22 +1,25 @@
 // app/(auth)/sign-up.tsx
+import { Ionicons } from '@expo/vector-icons';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
-  Text,
+  Alert,
   ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  StyleSheet,
+  View,
 } from 'react-native';
-import { Link, router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
-import { signUpSuccess } from '../../store/slices/authSlice';
 import StatusBar from '../../components/common/StatusBar';
 import { Colors } from '../../constants/Colors';
+import { signUpSuccess } from '../../store/slices/authSlice';
+
+import { getAuth } from '@react-native-firebase/auth';
 
 export default function SignUpScreen() {
+  const auth = getAuth();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: '',
@@ -53,7 +56,29 @@ export default function SignUpScreen() {
     setLoading(true);
     try {
       // Simulate API call
+      const firstName = formData.name.split(' ')[0];
+      const lastName = formData.name.split(' ').slice(1).join(' ');
+
+      console.log(firstName)
+      console.log(lastName)
+      console.log(formData.email)
+      console.log(formData.password)
+      console.log(formData.phoneNumber)
+
       await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await fetch('http://<BACKEND_URL_HERE>/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
+          email: formData.email,
+          password: formData.password,
+          phoneNumber: formData.phoneNumber,
+        }),
+      })
       
       const mockUser = {
         id: `user_${Date.now()}`,
@@ -68,9 +93,12 @@ export default function SignUpScreen() {
         createdAt: new Date().toISOString(),
       };
 
+      auth.signInWithCustomToken((await response.json()).token);
+
       dispatch(signUpSuccess({ user: mockUser, token: 'mock_jwt_token' }));
       router.push('/(auth)/verify-code');
     } catch (error) {
+      console.log(error);
       Alert.alert('Sign Up Failed', 'Please try again');
     } finally {
       setLoading(false);
@@ -134,6 +162,18 @@ export default function SignUpScreen() {
             secureTextEntry
             value={formData.confirmPassword}
             onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Phone Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="+1 234 567 8901"
+            placeholderTextColor={Colors.placeholder}
+            secureTextEntry
+            value={formData.phoneNumber}
+            onChangeText={(text) => setFormData({ ...formData, phoneNumber: text })}
           />
         </View>
 

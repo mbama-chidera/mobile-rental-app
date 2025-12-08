@@ -1,9 +1,9 @@
 // app/booking/success.tsx
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import StatusBar from '../../components/common/StatusBar';
+import { router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Button from '../../components/common/Button';
+import StatusBar from '../../components/common/StatusBar';
 import { Colors } from '../../constants/Colors';
 
 export default function BookingSuccessScreen() {
@@ -22,6 +22,7 @@ export default function BookingSuccessScreen() {
     <View style={styles.container}>
       <StatusBar />
       
+      <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         {/* Success Icon */}
         <View style={styles.successIcon}>
@@ -120,12 +121,13 @@ export default function BookingSuccessScreen() {
         {/* Home Button */}
         <TouchableOpacity
           style={styles.homeButton}
-          onPress={() => router.replace('/(tabs)')}
+          onPress={() => router.replace('/(tabs)/home')}
         >
           <Ionicons name="home" size={20} color={Colors.primary} />
           <Text style={styles.homeButtonText}>Return to Home</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </View>
   );
 }
